@@ -1,15 +1,18 @@
 
 import java.io.File;
+import java.util.Objects;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+
 public class App extends javax.swing.JFrame {
+
 
     public App() {
         setLocationRelativeTo(null);
         initComponents();
     }
-
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
@@ -17,6 +20,7 @@ public class App extends javax.swing.JFrame {
         File_JButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jFiles = new javax.swing.JTextPane();
+        Del_JButton = new javax.swing.JButton();
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         openMenuItem = new javax.swing.JMenuItem();
@@ -53,6 +57,13 @@ public class App extends javax.swing.JFrame {
 
         jFiles.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jScrollPane1.setViewportView(jFiles);
+
+        Del_JButton.setText("Xóa");
+        Del_JButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Del_JButtonActionPerformed(evt);
+            }
+        });
 
         fileMenu.setMnemonic('f');
         fileMenu.setText("File");
@@ -123,14 +134,16 @@ public class App extends javax.swing.JFrame {
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addGap(33, 33, 33)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 572, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jTextField_Path)
-                                                .addGap(18, 18, 18)
-                                                .addComponent(File_JButton, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(Del_JButton, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 572, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGroup(layout.createSequentialGroup()
+                                                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(jTextField_Path)
+                                                        .addGap(18, 18, 18)
+                                                        .addComponent(File_JButton, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))))
                                 .addContainerGap(24, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -144,7 +157,9 @@ public class App extends javax.swing.JFrame {
                                         .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(18, 18, 18)
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(39, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(Del_JButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(10, 10, 10))
         );
 
         pack();
@@ -169,6 +184,37 @@ public class App extends javax.swing.JFrame {
             jFiles.setText(listAllFiles(path, 0));
         }
     }
+
+    private void Del_JButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        int choose = JOptionPane.showConfirmDialog(this, "Có muốn xóa không ?", "Xác nhận", JOptionPane.YES_NO_OPTION);
+        //Chon khong
+        if(choose == JOptionPane.NO_OPTION) return ;
+
+        //Chon co
+        String path =  jTextField_Path.getText();
+        DeleteFiles(path);
+        JOptionPane.showMessageDialog(this, "Đã xóa thành công");
+
+    }
+
+    private void DeleteFiles(String path) {
+        try {
+            File myFile = new File(path);
+            if(myFile.isDirectory()){ //neu la thu muc
+                for(File f : Objects.requireNonNull(myFile.listFiles())) {
+                    DeleteFiles(f.getAbsolutePath());
+
+                }
+            }
+            //Neu la file
+            myFile.delete();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     private String listAllFiles(String path, int level){
         File myFile = new File(path);
         if(!myFile.exists()) return ""; //KT khong ton tai
@@ -183,17 +229,20 @@ public class App extends javax.swing.JFrame {
         result += ((level == 0?"":"|_") + myFile.getName() + "\n");
         if(myFile.isFile()) return result; //KT co phai file ko
 
-        for(File f : myFile.listFiles()) {
-            System.out.println();
-            result = result + (listAllFiles(f.getAbsolutePath(), level + 1) + "\n");
+        for(File f : Objects.requireNonNull(myFile.listFiles())) {
+            System.out.println("");
+            result += listAllFiles(f.getAbsolutePath(), level + 1) + "\n";
         }
         return result;
     }
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
+
+    public static void main(String[] args) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -210,13 +259,13 @@ public class App extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(App.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
+
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
 
         }
-        /* Create and display the form */
+
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new App().setVisible(true);
@@ -224,7 +273,8 @@ public class App extends javax.swing.JFrame {
         });
     }
 
-    // Variables declaration - do not modify
+
+    private javax.swing.JButton Del_JButton;
     private javax.swing.JButton File_JButton;
     private javax.swing.JMenuItem aboutMenuItem;
     private javax.swing.JMenuItem contentsMenuItem;
@@ -244,6 +294,6 @@ public class App extends javax.swing.JFrame {
     private javax.swing.JMenuItem pasteMenuItem;
     private javax.swing.JMenuItem saveAsMenuItem;
     private javax.swing.JMenuItem saveMenuItem;
-    // End of variables declaration
+
 
 }
